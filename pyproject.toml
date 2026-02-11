@@ -1,0 +1,10 @@
+[project]
+name = "dantec-graphql"
+version = "0.0.0"
+description = "Sets up and provides development tools for a GraphQL server."
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi>=0.128.7",
+    "strawberry-graphql[cli]>=0.291.3",
+]
