@@ -5,6 +5,8 @@ description = "Sets up and provides development tools for a GraphQL server."
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+    "d>=0.2.2",
     "fastapi>=0.128.7",
-    "strawberry-graphql[cli]>=0.291.3",
+    "strawberry-graphql[cli,fastapi]>=0.291.3",
+    "uvicorn[standard]>=0.40.0",
 ]

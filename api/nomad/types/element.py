@@ -1,5 +1,5 @@
 import os
-from typing import List, Dict, Iterable
+from typing import List, Dict, Iterable, Optional
 
 import strawberry
 
@@ -17,26 +17,26 @@ class Element(strawberry.relay.Node):
     id: strawberry.relay.NodeID[int]
     source_repo: str = "Nomad"
     name: str
-    appearance: str
-    atomic_mass: float 
-    boil: float 
-    category: str
-    color: str
-    density: float
-    discovered_by: str
-    melt: float
-    molar_heat: float
-    named_by: str
-    number: int
-    period: int
-    phase: str
-    source: str
-    spectral_img: str
-    summary: str
+    appearance: Optional[str]
+    atomic_mass: Optional[float] 
+    boil: Optional[float] 
+    category: Optional[str]
+    color: Optional[str]
+    density: Optional[float]
+    discovered_by: Optional[str]
+    melt: Optional[float]
+    molar_heat: Optional[float]
+    named_by: Optional[str]
+    number: Optional[int]
+    period: Optional[int]
+    phase: Optional[str]
+    source: Optional[str]
+    spectral_img: Optional[str]
+    summary: Optional[str]
     symbol: str
-    xpos: int
-    ypos: int
-    shells: List[int]
+    xpos: Optional[int]
+    ypos: Optional[int]
+    shells: Optional[List[int]]
 
 
     @classmethod

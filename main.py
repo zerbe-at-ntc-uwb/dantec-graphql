@@ -3,6 +3,7 @@ from strawberry.fastapi import GraphQLRouter
 
 from api.schema import schema
 
-app = FastAPI()
+graphql_app = GraphQLRouter(schema)
 
-graphql_router = GraphQLRouter(schema, path="/")
+app = FastAPI()
+app.include_router(graphql_app, prefix='/graphql')
