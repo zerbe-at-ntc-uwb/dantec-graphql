@@ -34,7 +34,8 @@ class Entry(strawberry.relay.Node):
     last_processing_time: str
     license: str
     main_author: User
-    mainfile: str
+    mainfile: Optional[str] = None
+    mainfile_key: Optional[str] = None
     n_quantities: int
     nomad_commit: str
     nomad_distro_commit_url: Optional[str] = None
