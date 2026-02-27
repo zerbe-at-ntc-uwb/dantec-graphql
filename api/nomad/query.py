@@ -3,7 +3,8 @@ from typing import List
 import strawberry
 
 from .resolvers import get_elements, get_element, search_nomad_entries
-from .types import Element, Entry
+from .types import Element
+from ..types import RecordConnection
 
 
 @strawberry.type(description="The Nomad query interface")
@@ -13,6 +14,7 @@ class Query:
     elements: List[Element] = strawberry.field(description="All elements",
                                                resolver=get_elements)
 
-    entries: List[Entry] = strawberry.field(
-            description="Interface to NomadSearch API",
-            resolver=search_nomad_entries)
+    records: RecordConnection = strawberry.field(
+        description="Interface with Nomad entry query API.",
+        resolver=search_nomad_entries
+    )

@@ -16,4 +16,4 @@ def get_element(symbol: str) -> Element:
     """
     Get element by symbol.
     """
-    return element_resource.element_symbol_dict[symbol]
+    return element_resource.element_id_dict[symbol]

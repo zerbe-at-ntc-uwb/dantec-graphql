@@ -14,7 +14,7 @@ class Element(strawberry.relay.Node):
     """
     Stores information from the periodic table of elements.
     """
-    id: strawberry.relay.NodeID[int]
+    id: strawberry.relay.NodeID[str]
     source_repo: str = "Nomad"
     name: str
     appearance: Optional[str]
@@ -53,7 +53,7 @@ class Element(strawberry.relay.Node):
         el_id_dict: Dict[int, Element] = get_element_resource().element_id_dict
 
         return [
-            el_id_dict[int(nid)] if required
+            el_id_dict[nid] if required
             else el_id_dict().get(nid) for nid in node_ids
         ]
 
@@ -77,23 +77,13 @@ class ElementResource(JSONResource):
         self._element_id_dict: Dict[int, Element] = {}
 
     @property
-    def element_symbol_dict(self) -> Dict[str, Element]:
-        """
-        Lazy load a dictionary of elements keyed by name.
-        """
-        if len(self._element_symbol_dict) == 0:
-            for element in self.list:
-                self._element_symbol_dict[element.symbol] = element
-        return self._element_symbol_dict
-
-    @property
-    def element_id_dict(self) -> Dict[int, Element]:
+    def element_id_dict(self) -> Dict[str, Element]:
         """
         Lazy load a dictionary of elements keyed by name.
         """
         if len(self._element_id_dict) == 0:
             for element in self.list:
-                self._element_id_dict[int(element.id)] = element
+                self._element_id_dict[element.symbol] = element
         return self._element_id_dict
 
 
