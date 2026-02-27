@@ -27,7 +27,8 @@ def page_info_from_response_dict(response_dict: Dict) -> ForwardPageInfo:
     page_size = response_dict["pagination"]["page_size"]
     response_size = len(response_dict["data"])
     if response_size == 0:
-        return ForwardPageInfo(has_next_page=False)
+        return ForwardPageInfo(has_next_page=False,
+                               end_cursor=None)
     if response_size < page_size:
         has_next_page = False
     else:
