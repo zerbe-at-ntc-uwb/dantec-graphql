@@ -2,44 +2,58 @@
 Resolver(s) for loading entry objects from Nomad.
 """
 import json
-from typing import Dict, Iterable, List, Optional
+from typing import Dict, Iterable, List, Optional, Tuple, TypeAlias
 
 import requests
 import strawberry
 
 from ...resolvers.inputs import SearchRecordInput, PaginationInput
-from ...types import ForwardPageInfo, Record, RecordConnection, encode_cursor
+from ...resolvers.record_connection import RecordConnection
+from ...types import Record, StandardCursorFactory
 from .nomad_data_access import NomadEntryQueryAPI
 
 
-def entries_from_response_dict(response_dict: Dict) -> List[Record]:
+EntryInfo: TypeAlias = Tuple[StandardCursorFactory, List[Record]]
+PageInfo: TypeAlias = Tuple[str, str, bool]
+
+
+def entries_from_response_dict(response_dict: Dict) -> EntryInfo:
+    data = response_dict["data"]
+    if len(data) == 0:
+        return None, []
+
+    entry_cursor_factory = StandardCursorFactory("Nomad", "Record")
+    pack = entry_cursor_factory.pack
     entries : List[Record] = []
     for entry_dict in response_dict["data"]:
-        entries.append(Record(id=encode_cursor("Nomad:", entry_dict["entry_id"]),
+        entries.append(Record(cursor=pack(entry_dict["entry_id"]),
                               contents={**entry_dict["results"],
                                         "source_repo": "Nomad"}
                              )
                       )
-    return entries
+    return entry_cursor_factory, entries
 
 
-def page_info_from_response_dict(response_dict: Dict) -> ForwardPageInfo:
-    page_size = response_dict["pagination"]["page_size"]
-    response_size = len(response_dict["data"])
+def page_info_from_response_dict(response_dict: Dict) -> PageInfo:
+    data = response_dict["data"]
+    response_size = len(data)
     if response_size == 0:
-        return ForwardPageInfo(has_next_page=False,
-                               end_cursor=None)
-    if response_size < page_size:
+        first_id = None
+        last_id = None
         has_next_page = False
     else:
-        has_next_page = True
-    return ForwardPageInfo(
-        has_next_page=has_next_page,
-        end_cursor=response_dict["data"][-1]["entry_id"]
-    )
+        id_key = "entry_id" 
+        first_id = data[0][id_key]
+        last_id = data[-1][id_key]
+        page_size = response_dict["pagination"]["page_size"]
+        if response_size < page_size:
+            has_next_page = False
+        else:
+            has_next_page = True
+    return first_id, last_id, has_next_page
 
 
-def get_nomad_entries(entry_ids: List[str]) -> List[Record]:
+def get_nomad_entries(entry_ids: List[str]) -> EntryInfo:
     """
     Resolver to load a list of NomadEntry types given their [nomad] entry_id.
     """
@@ -58,8 +72,11 @@ def search_nomad_entries(search_record_input: SearchRecordInput,
     nomad_api = NomadEntryQueryAPI(page_input=page_input)
     nomad_api.translate_query(search_record_input)
     response_dict = nomad_api.post()
+    entry_cursor_factory, entries = entries_from_response_dict(response_dict)
+    first_id, last_id, has_next_page = page_info_from_response_dict(response_dict)
 
-    return RecordConnection(
-        page_info=page_info_from_response_dict(response_dict),
-        records=entries_from_response_dict(response_dict)
-    )
+    return RecordConnection.resolve_connection(entries,
+                                               entry_cursor_factory,
+                                               first_id=first_id,
+                                               last_id=last_id,
+                                               has_next_page=has_next_page)

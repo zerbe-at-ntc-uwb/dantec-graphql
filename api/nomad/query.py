@@ -4,7 +4,7 @@ import strawberry
 
 from .resolvers import get_elements, get_element, search_nomad_entries
 from .types import Element
-from ..types import RecordConnection
+from ..resolvers.record_connection import RecordConnection
 
 
 @strawberry.type(description="The Nomad query interface")

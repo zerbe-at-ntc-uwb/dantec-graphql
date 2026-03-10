@@ -1,7 +1,8 @@
-from typing import List
+from typing import Dict
 
 import strawberry
-from .forward_page_info import ForwardPageInfo
+
+from .cursor import encode_cursor
 
 ####### Main Type #######################
 
@@ -9,19 +10,9 @@ from .forward_page_info import ForwardPageInfo
 @strawberry.type(
     description="Basic record with contents for viewing."
 )
-class Record:
-    id: str
+class Record(strawberry.relay.Node):
+    cursor: strawberry.relay.NodeID[str]
     contents: strawberry.scalars.JSON = strawberry.field(
         description="JSON formatted contents of record."
     )
 
-
-@strawberry.type
-class RecordConnection:
-    page_info: ForwardPageInfo = strawberry.field(
-        description="Information to aid in forward pagination across sources."
-    )
-
-    records: List[Record] = strawberry.field(
-        description="A list of records from the connection."
-    )
